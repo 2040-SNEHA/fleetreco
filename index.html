@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fleet - Web_Tracker_Login</title>
+    <link rel="stylesheet" href='styles.css'>
+</head>
+<body>
+    <div class="container">
+        <h1>Fleet - Web_Tracker</h1>
+        <form id="loginForm">
+            <label for="email">Enter your email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email...">
+            <button type="button" id="loginButton">Login</button>
+        </form>
+        <div id="urlForm" style="display:none;">
+            <form id="redirectForm">
+                <label for="redirectUrl">Enter the URL to redirect:</label>
+                <input type="text" id="redirectUrl" name="redirectUrl" placeholder="Enter the URL...">
+                <button type="submit">Start Recording</button>
+                <!-- New "Stop Recording" button -->
+                <button type="button" id="stopRecordingBtn" style="display: none;">Stop Recording</button>
+            </form>
+        </div>
+        <div id="confirmationMsg" style="display:none;">
+            <p>Press the button below to start recording and navigate to the specified URL:</p>
+            <button id="confirmRedirectBtn">Start Recording</button>
+        </div>
+        <!-- New div to display recorded actions -->
+        <div id="recordedActions" style="display:none;">
+            <p>Recorded Actions:</p>
+            <pre id="jsonCode"></pre>
+        </div>
+    </div>
+
+    <script>
+        let redirectUrl = '';
+        let recording = false;
+        let actions = [];
+
+        document.getElementById('loginButton').addEventListener('click', function(event) {
+            const email = document.getElementById('email').value;
+            // Perform any client-side validation if needed.
+            if (email.trim() !== '') {
+                // Show URL input form after login
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('urlForm').style.display = 'block';
+            }
+        });
+
+        document.getElementById('redirectForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent form submission to avoid page reload
+
+            redirectUrl = document.getElementById('redirectUrl').value;
+            // Perform any client-side validation if needed.
+            if (redirectUrl.trim() !== '') {
+                // Show confirmation message and hide URL input form
+                document.getElementById('urlForm').style.display = 'none';
+                document.getElementById('confirmationMsg').style.display = 'block';
+            }
+        });
+
+        document.getElementById('confirmRedirectBtn').addEventListener('click', async function() {
+            // Redirect to the specified URL in the same tab
+            window.location.href = redirectUrl;
+        });
+
+        // Event listener for the "Stop Recording" button
+        document.getElementById('stopRecordingBtn').addEventListener('click', function() {
+            recording = false;
+            document.getElementById('stopRecordingBtn').style.display = 'none';
+            document.getElementById('confirmRedirectBtn').style.display = 'block';
+            document.getElementById('recordedActions').style.display = 'block';
+            document.getElementById('jsonCode').textContent = JSON.stringify(actions, null, 2);
+        });
+
+        // Event listener for the "Start Recording" button
+        document.getElementById('confirmRedirectBtn').addEventListener('click', async function() {
+            // Clear existing recorded actions
+            actions = [];
+            recording = true;
+            document.getElementById('confirmRedirectBtn').style.display = 'none';
+            document.getElementById('stopRecordingBtn').style.display = 'block';
+            document.getElementById('recordedActions').style.display = 'none';
+
+            // Start recording user actions
+            while (recording) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // Add a small delay to record actions
+
+                // Here you can use Puppeteer to record user actions, for example:
+                // const action = await page.waitForSelector('button');
+                // actions.push(action);
+            }
+        });
+    </script>
+</body>
+</html>
